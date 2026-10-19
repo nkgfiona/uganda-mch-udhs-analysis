@@ -18,7 +18,7 @@ A reproducible analysis of how maternal and child health changed in Uganda betwe
 ---
 
 ## Report and Dashboard Preview
-<img width="1720" height="924" alt="Stunting" src="https://github.com/user-attachments/assets/b2a59f4a-0bf4-47ff-994f-578fa53404a6" />
+<img width="1500" height="825" alt="02_regional_comparison_bars" src="https://github.com/user-attachments/assets/32bfd9d5-9382-410a-827d-ffe9b396024e" />
 <img width="1500" height="825" alt="01_trend_by_indicator" src="https://github.com/user-attachments/assets/c817ccdd-dafb-450b-87e3-0a8abef433e7" />
 <img width="1500" height="900" alt="06_national_mortality_mmr_tfr" src="https://github.com/user-attachments/assets/2aa0a404-d58d-4b16-960a-aa25c2c994ba" />
 
