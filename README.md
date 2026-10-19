@@ -18,11 +18,15 @@ A reproducible analysis of how maternal and child health changed in Uganda betwe
 ---
 
 ## Report and Dashboard Preview
-https://nkgfiona.github.io/uganda-mch-udhs-analysis/r/mch_report.html
+<img width="1500" height="825" alt="01_trend_by_indicator" src="https://github.com/user-attachments/assets/a4911416-7741-4854-adcc-440199da7aed" />
+<img width="1500" height="825" alt="02_regional_comparison_bars" src="https://github.com/user-attachments/assets/def2d86b-7c7d-494a-9497-343b84d9a331" />
+<img width="1200" height="900" alt="05_subregion_sba_vs_stunting_2022" src="https://github.com/user-attachments/assets/73cc06c8-9a38-4fd0-8826-4d3f3e40f041" />
+<img width="1500" height="900" alt="06_national_mortality_mmr_tfr" src="https://github.com/user-attachments/assets/a07b950e-6b2e-468b-bcf5-95ddf86001fc" />
+
 <img width="1726" height="935" alt="SBA" src="https://github.com/user-attachments/assets/5d6af2f1-02cc-4630-95a6-04b2db001cea" />
 <img width="1720" height="924" alt="Stunting" src="https://github.com/user-attachments/assets/e78cd54f-36e3-4958-b175-96ca1bbc32d1" />
 
-- **Report:** `r/mch_report.html` is the rendered report. Open it in any browser.
+- **Report:** `[r/mch_report.html](https://nkgfiona.github.io/uganda-mch-udhs-analysis/r/mch_report.html)` is the rendered report. Open it in any browser.
 - **Dashboard:** `powerbi/mch.pbix` opens in [Power BI Desktop](https://www.microsoft.com/en-us/power-platform/products/power-bi/downloads) (free, Windows only). It contains only published aggregate figures. No individual-level data is embedded. See **The Dashboard** below.
 
 ---
