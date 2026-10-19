@@ -26,7 +26,7 @@ A reproducible analysis of how maternal and child health changed in Uganda betwe
 <img width="1726" height="935" alt="SBA" src="https://github.com/user-attachments/assets/5d6af2f1-02cc-4630-95a6-04b2db001cea" />
 <img width="1720" height="924" alt="Stunting" src="https://github.com/user-attachments/assets/e78cd54f-36e3-4958-b175-96ca1bbc32d1" />
 
-- **Report:** `[r/mch_report.html](https://nkgfiona.github.io/uganda-mch-udhs-analysis/r/mch_report.html)` is the rendered report. Open it in any browser.
+- **Report:** `https://nkgfiona.github.io/uganda-mch-udhs-analysis/r/mch_report.html` is the rendered report. Open it in any browser.
 - **Dashboard:** `powerbi/mch.pbix` opens in [Power BI Desktop](https://www.microsoft.com/en-us/power-platform/products/power-bi/downloads) (free, Windows only). It contains only published aggregate figures. No individual-level data is embedded. See **The Dashboard** below.
 
 ---
