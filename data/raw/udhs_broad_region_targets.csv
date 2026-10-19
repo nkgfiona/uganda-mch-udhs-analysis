@@ -1,0 +1,9 @@
+survey_year,region,sba_pct,stunted_pct,births_n,region_share,stunting_weight_basis
+2016,Central,82.2,26.2,4106,0.2688,children N
+2016,Eastern,69.9,25.5,4298,0.2814,children N
+2016,Northern,75.3,29.9,3039,0.199,children N
+2016,Western,69.3,34.5,3830,0.2508,children N
+2022,Central,92.4,20.8,1616,0.2822,children N
+2022,Eastern,85.6,20.5,1551,0.2708,children N
+2022,Northern,87.5,25.1,1208,0.2109,children N
+2022,Western,87.7,31.0,1352,0.2361,children N

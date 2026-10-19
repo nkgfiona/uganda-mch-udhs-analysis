@@ -1,0 +1,30 @@
+survey_year,subregion,broad_region,skilled_birth_attendance_pct,births_n,stunted_pct,stunting_children_n,source
+2016,South Central,Central,82.4,1881,26.5,619,UDHS 2016 Tables 9.6 & 11.1
+2016,North Central,Central,77.3,1645,28.0,520,UDHS 2016 Tables 9.6 & 11.1
+2016,Kampala,Central,95.5,580,18.1,146,UDHS 2016 Tables 9.6 & 11.1
+2016,Busoga,Eastern,74.7,1527,29.0,538,UDHS 2016 Tables 9.6 & 11.1
+2016,Bukedi,Eastern,67.2,1060,22.8,363,UDHS 2016 Tables 9.6 & 11.1
+2016,Bugisu,Eastern,57.6,763,36.0,251,UDHS 2016 Tables 9.6 & 11.1
+2016,Teso,Eastern,75.3,948,14.3,322,UDHS 2016 Tables 9.6 & 11.1
+2016,Karamoja,Northern,72.5,432,35.2,120,UDHS 2016 Tables 9.6 & 11.1
+2016,Lango,Northern,68.3,799,22.3,288,UDHS 2016 Tables 9.6 & 11.1
+2016,Acholi,Northern,80.8,741,30.6,270,UDHS 2016 Tables 9.6 & 11.1
+2016,West Nile,Northern,77.9,1067,33.9,348,UDHS 2016 Tables 9.6 & 11.1
+2016,Bunyoro,Western,57.7,905,34.5,311,UDHS 2016 Tables 9.6 & 11.1
+2016,Tooro,Western,75.9,1210,40.6,454,UDHS 2016 Tables 9.6 & 11.1
+2016,Kigezi,Western,70.7,506,30.7,168,UDHS 2016 Tables 9.6 & 11.1
+2016,Ankole,Western,70.8,1209,29.3,399,UDHS 2016 Tables 9.6 & 11.1
+2022,Kampala,Central,96.9,248,15.5,220,UDHS 2022 Tables 9.6 & 11.1
+2022,Buganda,Central,91.6,1368,22.4,735,UDHS 2022 Tables 9.6 & 11.1
+2022,Busoga,Eastern,87.4,553,21.2,480,UDHS 2022 Tables 9.6 & 11.1
+2022,Bukedi,Eastern,83.4,352,27.2,374,UDHS 2022 Tables 9.6 & 11.1
+2022,Elgon,Eastern,85.6,232,22.4,306,UDHS 2022 Tables 9.6 & 11.1
+2022,Teso,Eastern,84.9,414,12.9,441,UDHS 2022 Tables 9.6 & 11.1
+2022,Karamoja,Northern,86.7,399,41.1,311,UDHS 2022 Tables 9.6 & 11.1
+2022,Lango,Northern,87.6,368,16.6,298,UDHS 2022 Tables 9.6 & 11.1
+2022,Acholi,Northern,88.9,221,16.7,265,UDHS 2022 Tables 9.6 & 11.1
+2022,West Nile,Northern,87.3,220,24.6,372,UDHS 2022 Tables 9.6 & 11.1
+2022,Bunyoro,Western,84.7,395,24.2,366,UDHS 2022 Tables 9.6 & 11.1
+2022,Tooro,Western,88.3,387,37.0,344,UDHS 2022 Tables 9.6 & 11.1
+2022,Ankole,Western,89.6,376,28.6,313,UDHS 2022 Tables 9.6 & 11.1
+2022,Kigezi,Western,88.9,194,37.4,189,UDHS 2022 Tables 9.6 & 11.1

@@ -1,0 +1,379 @@
+---
+title: "Maternal & Child Health in Uganda: Trends and Determinants, 2016-2022"
+author: "Nakabugo Kabuka Fiona"
+date: "`r format(Sys.Date(), '%d %B %Y')`"
+output:
+  html_document:
+    toc: true
+    toc_depth: 2
+    toc_float: true
+    self_contained: true
+    mathjax: null
+---
+
+```{r setup, include=FALSE}
+# ---------------------------------------------------------------------------
+# HOW THIS REPORT WORKS
+#   This report only READS the files the analysis scripts have already written.
+#   It never re-runs the scripts and has no numbers typed into the text, so the
+#   report, the figures and the Power BI dashboard (which reads the same CSVs)
+#   don't disagree.
+#
+#   Run order (from the r/ folder):
+#     1. mch_aggregate_analysis.R
+#     2. generate_synthetic_mch_data.R
+#     3. mch_regression_analysis.R
+#     4. knit this file  (rmarkdown::render("mch_report.Rmd"))
+#
+#   Keep this file in r/ (or in the project root; both work).
+# ---------------------------------------------------------------------------
+knitr::opts_chunk$set(echo = FALSE, message = FALSE, warning = FALSE,
+                      fig.align = "center", out.width = "100%")
+
+library(dplyr)
+library(tidyr)
+library(readr)
+library(knitr)
+
+# ---- Locate the project folders ------------------------------------------
+ROOT <- if (dir.exists("../data/processed")) ".." else if (dir.exists("data/processed")) "." else
+  stop("Can't find data/processed/. Put this file in the r/ folder (or the project root) and run the analysis scripts first.")
+PROC <- file.path(ROOT, "data", "processed")
+RAW  <- file.path(ROOT, "data", "raw")
+FIGD <- file.path(ROOT, "documentation", "figures")
+
+needed <- c(
+  file.path(PROC, c("region_change_summary.csv", "subregion_change_summary.csv",
+                    "subregion_correlations.csv", "national_mmr_test.csv",
+                    "national_mortality_tfr_change.csv", "model_fit_summary.csv",
+                    "or_table_sba.csv", "or_table_stunting.csv",
+                    "region_year_interaction_tests.csv", "recovery_check.csv")),
+  file.path(RAW,  c("mch_synthetic_data.csv", "udhs_broad_region_targets.csv")),
+  file.path(FIGD, c("01_trend_by_indicator.png", "02_regional_comparison_bars.png",
+                    "03_subregion_sba_change.png", "04_subregion_stunting_change.png",
+                    "05_subregion_sba_vs_stunting_2022.png", "06_national_mortality_mmr_tfr.png")))
+missing <- needed[!file.exists(needed)]
+if (length(missing)) stop("Missing files. Run the three analysis scripts first, then knit again:\n  ",
+                          paste(missing, collapse = "\n  "))
+
+fig <- function(f) knitr::include_graphics(file.path(FIGD, f))
+
+# ---- Load the tidy outputs ------------------------------------------------
+rc   <- read_csv(file.path(PROC, "region_change_summary.csv"), show_col_types = FALSE)
+sc   <- read_csv(file.path(PROC, "subregion_change_summary.csv"), show_col_types = FALSE)
+cors <- read_csv(file.path(PROC, "subregion_correlations.csv"), show_col_types = FALSE)
+mmr  <- read_csv(file.path(PROC, "national_mmr_test.csv"), show_col_types = FALSE)
+oth  <- read_csv(file.path(PROC, "national_mortality_tfr_change.csv"), show_col_types = FALSE)
+fit  <- read_csv(file.path(PROC, "model_fit_summary.csv"), show_col_types = FALSE)
+or_s <- read_csv(file.path(PROC, "or_table_sba.csv"), show_col_types = FALSE)
+or_t <- read_csv(file.path(PROC, "or_table_stunting.csv"), show_col_types = FALSE)
+lrt  <- read_csv(file.path(PROC, "region_year_interaction_tests.csv"), show_col_types = FALSE)
+rec  <- read_csv(file.path(PROC, "recovery_check.csv"), show_col_types = FALSE)
+syn  <- read_csv(file.path(RAW,  "mch_synthetic_data.csv"), show_col_types = FALSE)
+tgt  <- read_csv(file.path(RAW,  "udhs_broad_region_targets.csv"), show_col_types = FALSE)
+
+# ---- Small formatting helpers --------------------------------------------
+V_ROBUST <- "Significant (robust to design effect = 2)"
+V_NAIVE  <- "Significant only if design effect ignored"
+fmt_p   <- function(p) ifelse(p < 0.0001, "< 0.0001", sprintf("= %.4f", p))
+fmt_p0  <- function(p) ifelse(p < 0.0001, "< 0.0001", sprintf("%.4f", p))
+sgn     <- function(x, d = 1) sprintf(paste0("%+.", d, "f"), x)
+words   <- c("zero","one","two","three","four","five","six","seven","eight","nine","ten",
+             "eleven","twelve","thirteen","fourteen")
+nw      <- function(n) ifelse(n <= 14, words[n + 1], as.character(n))
+cap     <- function(s) paste0(toupper(substring(s, 1, 1)), substring(s, 2))
+verdict_text <- function(v) dplyr::case_when(
+  v == V_ROBUST ~ "Holds up under the design-effect check",
+  v == V_NAIVE  ~ "Significant only if the design effect is ignored",
+  TRUE          ~ "No statistically detectable change")
+
+# ---- National headline numbers (real data) --------------------------------
+nat_sba <- rc %>% filter(unit == "National", indicator == "Skilled birth attendance")
+nat_st  <- rc %>% filter(unit == "National", indicator == "Stunting (under 5)")
+
+# UDHS-published national stunting totals (Table 11.1 "Total" row, both years).
+# Used only to cross-reference the derived national estimate above.
+PUB_ST <- tibble(year = c(2016, 2022), pct = c(28.9, 24.4), n = c(5117, 5012))
+pub_change <- PUB_ST$pct[2] - PUB_ST$pct[1]
+
+# ---- Region / sub-region objects -----------------------------------------
+reg_st  <- rc %>% filter(unit != "National", indicator == "Stunting (under 5)")
+reg_sba <- rc %>% filter(unit != "National", indicator == "Skilled birth attendance")
+sba_sub <- sc %>% filter(indicator == "Skilled birth attendance")
+st_sub  <- sc %>% filter(indicator == "Stunting (under 5)")
+
+n_sba_up       <- sum(sba_sub$change_pp > 0)
+n_sba_holm     <- sum(sba_sub$p_holm_deff2 < 0.05)
+top_sba        <- sba_sub %>% slice_max(change_pp, n = 2)
+low_sba        <- sba_sub %>% slice_min(change_pp, n = 1)
+n_st_fell      <- sum(st_sub$change_pp < 0)
+n_st_rose      <- sum(st_sub$change_pp > 0)
+n_st_robust    <- sum(st_sub$verdict == V_ROBUST)
+n_st_weak      <- sum(st_sub$verdict == V_NAIVE)
+n_st_holm      <- sum(st_sub$p_holm_deff2 < 0.05)
+big_falls      <- st_sub %>% slice_min(change_pp, n = 2)
+west_sba       <- reg_sba %>% filter(unit == "Western")
+spread <- function(d, yr) max(d[[paste0("value_", yr)]]) - min(d[[paste0("value_", yr)]])
+
+# ---- Correlations ---------------------------------------------------------
+c_lev22 <- cors %>% filter(grepl("2022 levels", comparison))
+c_chg   <- cors %>% filter(grepl("^Change", comparison))
+
+# ---- Synthetic-data validation (computed here from the files) -------------
+sim <- syn %>%
+  mutate(sba = skilled_birth_attendance == "Yes", st = stunted == "Yes") %>%
+  group_by(survey_year, region) %>%
+  summarise(sba_sim = 100 * mean(sba), st_sim = 100 * mean(st), .groups = "drop") %>%
+  left_join(tgt, by = c("survey_year", "region")) %>%
+  mutate(sba_diff = sba_sim - sba_pct, st_diff = st_sim - stunted_pct)
+max_diff <- max(abs(c(sim$sba_diff, sim$st_diff)))
+gradient <- syn %>%
+  mutate(sba = skilled_birth_attendance == "Yes",
+         wealth_quintile = factor(wealth_quintile, c("Poorest","Poorer","Middle","Richer","Richest"))) %>%
+  group_by(wealth_quintile) %>% summarise(sba = 100 * mean(sba), .groups = "drop")
+n_syn <- nrow(syn)
+
+# ---- Regression objects ---------------------------------------------------
+fit_sba <- fit %>% filter(model == "SBA")
+fit_st  <- fit %>% filter(model == "Stunting")
+n_rec   <- sum(rec$planted_inside_CI); n_rec_tot <- nrow(rec)
+or_get  <- function(tab, term) tab %>% filter(.data$term == !!term)
+lrt_s   <- lrt %>% filter(outcome == "Skilled birth attendance")
+lrt_t   <- lrt %>% filter(outcome == "Stunting")
+```
+
+## Executive Summary
+
+### Objectives
+This report has two parts with different evidential status, and they are kept apart throughout.
+
+1. **Real-data analysis (the findings).** It assesses national, regional and sub-regional progress in two maternal and child health indicators in Uganda between 2016 and 2022, using published tables from the Uganda Demographic and Health Surveys (UDHS):
+    - **Skilled birth attendance (SBA):** the proportion of births attended by a skilled health professional.
+    - **Child stunting:** the proportion of children under five (0-59 months) who are chronically malnourished.
+
+   National mortality, maternal mortality ratio (MMR) and fertility rates are added as context; these are only published nationally.
+
+2. **Method demonstration (not findings).** A logistic-regression workflow is built and validated on a *synthetic* cohort calibrated to the real regional rates. Its purpose is to show that the modelling code works. The associations in that section were built into the data and are **not estimates for Uganda**.
+
+### Key Findings (real UDHS data)
+- **Skilled birth attendance rose substantially.** Nationally it increased from `r sprintf("%.1f%%", nat_sba$value_2016)` in 2016 to `r sprintf("%.1f%%", nat_sba$value_2022)` in 2022, a gain of `r sprintf("%.1f", nat_sba$change_pp)` percentage points (p~deff2~ `r fmt_p(nat_sba$p_deff2)`). It rose in every region and in `r ifelse(n_sba_up == 14, 'all 14', paste(nw(n_sba_up), 'of the 14'))` sub-regions.
+- **Child stunting fell nationally.** It declined from `r sprintf("%.1f%%", nat_st$value_2016)` to `r sprintf("%.1f%%", nat_st$value_2022)`, a fall of `r sprintf("%.1f", abs(nat_st$change_pp))` percentage points (p~deff2~ `r fmt_p(nat_st$p_deff2)`). [^pubtot] The fall is statistically robust nationally, but regional and sub-regional falls are weaker: only `r nw(sum(reg_st$verdict == V_ROBUST))` of the four regions show a fall that holds up under the design-effect check, and no sub-region fall remains significant after Holm correction.
+- **Maternal mortality fell.** The maternal mortality ratio declined from `r mmr$value_2016` to `r mmr$value_2022` per 100,000 live births (p `r fmt_p(mmr$p_value)`, based on the published confidence intervals).
+
+[^pubtot]: The national figures above are derived from the regional estimates, weighted by each region's share of births. The UDHS-published national totals (Table 11.1) are `r sprintf("%.1f%%", PUB_ST$pct[1])` in 2016 and `r sprintf("%.1f%%", PUB_ST$pct[2])` in 2022, a fall of `r sprintf("%.1f", abs(pub_change))` points. The two agree to within half a point, and the conclusion is the same.
+
+```{r key-table}
+key <- bind_rows(nat_sba, nat_st) %>%
+  transmute(Indicator = ifelse(indicator == "Skilled birth attendance", "Skilled birth attendance",
+                               "Child stunting, under five"),
+            `2016 (%)` = sprintf("%.1f", value_2016),
+            `2022 (%)` = sprintf("%.1f", value_2022),
+            `Change (pp)` = sgn(change_pp),
+            `95% CI, deff = 2` = sprintf("[%.1f, %.1f]", ci_low_deff2, ci_high_deff2),
+            `Robust to design effect?` = ifelse(verdict == V_ROBUST, "Yes", "No"))
+kable(key, align = "lrrrrc", caption = "National change, UDHS 2016 to 2022 (derived from regional estimates)")
+```
+
+### What the synthetic-data work does and does not show
+The regression code recovered `r n_rec` of `r n_rec_tot` planted effects within their 95% confidence intervals, which shows the estimation pipeline works. Because wealth, education, residence and antenatal-care effects were planted from a published Nigerian analysis, the fitted odds ratios illustrate the method and should not be read as evidence about determinants of SBA or stunting in Uganda.
+
+---
+
+## Data and Methods
+
+### Real data: sources and preparation
+- **Skilled birth attendance:** UDHS 2016 and 2022, Table 9.6 (assistance during delivery), by region and sub-region. The reference window differs between surveys: births in the 5 years before the survey in 2016, and in the 2 years before the survey in 2022 (see Limitations).
+- **Stunting:** UDHS 2016 and 2022, **Table 11.1** (children aged 0-59 months), for both years. The 2022 report also contains a Table 11.2 restricted to children aged 6-59 months, which reads higher because infants under six months are rarely classified as stunted. It is not used, so that both years share one age base.
+- **National-only indicators:** neonatal, infant and under-five mortality (five years before each survey), maternal mortality ratio and total fertility rate (seven years before each survey).
+- **Preparation:** values were extracted by hand from the published tables and checked for internal consistency (sub-region births sum to regional births; weighted sub-region rates reproduce the regional rates; regional rates reproduce the published national totals).
+- **Sub-region matching:** 2016 reports 15 sub-regions and 2022 reports 14. South Central and North Central (2016) are combined into Buganda, and Bugisu (2016) is renamed Elgon. These two matches are approximate.
+
+### Statistical methods (real data)
+- **Change** is reported in percentage points. Each change is tested with a two-proportion z-test using the reported sample sizes.
+- **Design effect.** UDHS uses clustered, weighted sampling, which makes simple-random-sampling p-values too optimistic, and true design effects are not available in the published summary tables. Every test is therefore run twice: naively, and with the variance doubled (design effect = 2) as a conservative stand-in. **p~deff2~** is the p-value from the conservative version. A change is called *robust* only if it is significant under both.
+- **Multiple comparisons.** Sub-regional results are also adjusted with the Holm procedure within each indicator (14 comparisons), reported as p~Holm~.
+- **Ecological correlation.** Spearman correlations across the 14 sub-regions describe patterns between areas, not between mothers or children.
+- **Maternal mortality ratio:** tested with a z-test on the difference, with standard errors derived from the published 95% confidence intervals. Mortality rates and the fertility rate have no published standard errors, so only point changes are reported.
+
+### Synthetic data (method demonstration only)
+To test regression code without individual-level survey records (which cannot be redistributed), a synthetic cohort of `r format(n_syn, big.mark = ",")` records was generated, one per birth in the two surveys' tables. Regional SBA and stunting rates in the cohort were calibrated to the real UDHS values, and national antenatal-care (4+ visits) coverage was calibrated to published figures. The effects of wealth, maternal education, urban residence and antenatal care were adapted from a published Nigerian DHS analysis. Everything else, including how wealth and education are distributed within a region, is synthetic.
+
+---
+
+## Results: National Trends (real data)
+
+### Skilled Birth Attendance and Stunting
+National SBA increased by `r sprintf("%.1f", nat_sba$change_pp)` percentage points, from `r sprintf("%.1f%%", nat_sba$value_2016)` to `r sprintf("%.1f%%", nat_sba$value_2022)` (p~deff2~ `r fmt_p(nat_sba$p_deff2)`). National stunting declined by `r sprintf("%.1f", abs(nat_st$change_pp))` percentage points, from `r sprintf("%.1f%%", nat_st$value_2016)` to `r sprintf("%.1f%%", nat_st$value_2022)` (p~deff2~ `r fmt_p(nat_st$p_deff2)`).
+
+```{r fig-national-trends, fig.cap="Figure 1: National and regional progress in skilled birth attendance and child stunting, 2016 and 2022 (dashed line: national)"}
+fig("01_trend_by_indicator.png")
+```
+
+### Maternal Mortality, Child Mortality and Fertility
+The maternal mortality ratio fell by `r abs(mmr$change)` deaths per 100,000 live births, from `r mmr$value_2016` (95% CI `r mmr$ci_lower_2016`-`r mmr$ci_upper_2016`) to `r mmr$value_2022` (95% CI `r mmr$ci_lower_2022`-`r mmr$ci_upper_2022`). This decline is statistically significant (p `r fmt_p(mmr$p_value)`). Neonatal, infant and under-five mortality and the total fertility rate also fell, but no standard errors are published for them, so these changes are described and not tested.
+
+```{r natl-table}
+units <- c("Neonatal mortality" = "per 1,000 live births", "Infant mortality" = "per 1,000 live births",
+           "Under-5 mortality" = "per 1,000 live births", "Maternal mortality ratio" = "per 100,000 live births",
+           "Total fertility rate" = "births per woman")
+natl <- bind_rows(
+  oth %>% transmute(indicator, value_2016, value_2022, change, test = "Not tested (no published SE)"),
+  mmr %>% transmute(indicator, value_2016, value_2022, change, test = paste0("z-test on published CIs, p ", fmt_p(p_value)))) %>%
+  mutate(indicator = factor(indicator, names(units))) %>% arrange(indicator) %>%
+  transmute(Indicator = as.character(indicator), Unit = units[as.character(indicator)],
+            `2016` = ifelse(indicator == "Total fertility rate", sprintf("%.1f", value_2016), sprintf("%.0f", value_2016)),
+            `2022` = ifelse(indicator == "Total fertility rate", sprintf("%.1f", value_2022), sprintf("%.0f", value_2022)),
+            Change = ifelse(indicator == "Total fertility rate", sgn(change, 1), sgn(change, 0)), Test = test)
+kable(natl, align = "llrrrl", caption = "National indicators, UDHS 2016 and 2022")
+```
+
+```{r fig-national-mortality, fig.cap="Figure 2: National mortality, maternal mortality ratio and fertility, 2016 and 2022 (error bars: published 95% CI, available for the maternal mortality ratio only)"}
+fig("06_national_mortality_mmr_tfr.png")
+```
+
+---
+
+## Results: Regional Findings (real data)
+
+### Broad regions
+The Western Region had the largest SBA gain (`r sgn(west_sba$change_pp)` points). The gap between the best and worst served regions narrowed from `r sprintf("%.1f", spread(reg_sba, 2016))` to `r sprintf("%.1f", spread(reg_sba, 2022))` points. For stunting the regional gap widened slightly, from `r sprintf("%.1f", spread(reg_st, 2016))` to `r sprintf("%.1f", spread(reg_st, 2022))` points, with the Western Region still highest in 2022. These comparisons of spread are descriptive and have not been tested.
+
+```{r fig-regional-bars, fig.cap="Figure 3: Regional comparison of skilled birth attendance and child stunting, 2016 and 2022"}
+fig("02_regional_comparison_bars.png")
+```
+
+The strength of evidence for the stunting decline varied across the four regions:
+
+```{r region-table}
+rt <- reg_st %>%
+  arrange(change_pp) %>%
+  transmute(Region = unit,
+            `2016 (%)` = sprintf("%.1f", value_2016), `2022 (%)` = sprintf("%.1f", value_2022),
+            `Change (pp)` = sgn(change_pp),
+            `p~deff2~` = sprintf("%.4f", p_deff2),
+            Interpretation = ifelse(p_deff2 < 0.05, "Significant before multiplicity adjustment", "Statistically inconclusive"))
+kable(rt, align = "lrrrrl", caption = "Change in child stunting by region")
+```
+
+National progress in child nutrition was therefore not uniform across regions. The data describe where improvement was clearest; they cannot, on their own, explain why it differed.
+
+### Sub-regional disaggregation and multiplicity control
+The analysis covered 14 comparable sub-regions and two indicators (28 tests). Inference used design-effect-adjusted p-values (p~deff2~) and, to limit false positives from running many tests, Holm-adjusted p-values (p~Holm~) computed within each indicator across the 14 sub-regions.
+
+**Skilled birth attendance.** SBA rose in `r ifelse(n_sba_up == 14, 'all 14', paste(nw(n_sba_up), 'of the 14'))` sub-regions, and `r nw(n_sba_holm)` of the increases remained statistically significant after Holm adjustment. The largest gains were in **`r top_sba$unit[1]`** (`r sgn(top_sba$change_pp[1])` points) and **`r top_sba$unit[2]`** (`r sgn(top_sba$change_pp[2])` points). Elgon (Bugisu in 2016) is one of the two approximately matched units, so its gain depends on that boundary assumption. **`r low_sba$unit`** recorded the smallest increase (`r sgn(low_sba$change_pp)` points, p~Holm~ = `r sprintf("%.4f", low_sba$p_holm_deff2)`), from `r sprintf("%.1f%%", low_sba$value_2016)` to `r sprintf("%.1f%%", low_sba$value_2022)`, which is consistent with a ceiling effect because coverage was already high in 2016.
+
+**Stunting.** Stunting fell in `r nw(n_st_fell)` sub-regions and rose in `r nw(n_st_rose)`. `r cap(nw(n_st_robust))` falls held up under the design-effect check and `r nw(n_st_weak)` more were significant only if the design effect was ignored, but **`r ifelse(n_st_holm == 0, "none", nw(n_st_holm))`** remained significant after Holm correction. The two largest falls show why correction matters:
+
+```{r holm-table}
+ht <- big_falls %>%
+  transmute(`Sub-region` = unit,
+            `Change (pp)` = sgn(change_pp),
+            `p~deff2~` = sprintf("%.4f", p_deff2),
+            `p~Holm~ (14 comparisons)` = sprintf("%.4f", p_holm_deff2),
+            Interpretation = ifelse(p_holm_deff2 < 0.05, "Confirmed after multiplicity control",
+                                    "Not confirmed after multiplicity control"))
+kable(ht, align = "lrrrl", caption = "The two largest stunting falls, before and after Holm adjustment")
+```
+
+An apparently significant reduction therefore becomes an improvement that cannot be confirmed once the full set of comparisons is taken into account. This is not evidence that stunting did not fall in these areas; it means the sub-regional samples are too small to confirm it.
+
+```{r fig-subregion-sba, fig.cap="Figure 4: Sub-regional changes in skilled birth attendance, 2016 to 2022 (* approximately matched across surveys)"}
+fig("03_subregion_sba_change.png")
+```
+
+```{r fig-subregion-stunting, fig.cap="Figure 5: Sub-regional changes in child stunting, 2016 to 2022 (* approximately matched across surveys)"}
+fig("04_subregion_stunting_change.png")
+```
+
+### Ecological association
+Figure 6 compares the 14 sub-regions in 2022. Across them, the level of SBA and the level of stunting were not significantly related (Spearman rho = `r sprintf("%.2f", c_lev22$spearman_rho)`, p = `r sprintf("%.3f", c_lev22$p_value)`). Comparing *changes* between surveys, sub-regions with larger SBA gains did not show systematically larger stunting reductions either (rho = `r sprintf("%.2f", c_chg$spearman_rho)`, p = `r sprintf("%.3f", c_chg$p_value)`).
+
+```{r fig-ecological-corr, fig.cap="Figure 6: Sub-regional association between SBA and stunting, 2022 (area-level, not individual-level)", out.width="85%"}
+fig("05_subregion_sba_vs_stunting_2022.png")
+```
+
+With only 14 areas these tests have little power, so this is an absence of evidence and not proof that the two are unrelated. Area-level patterns also cannot show what happens to individual mothers and children, and these data cannot say whether delivery care and child nutrition need separate interventions.
+
+---
+
+## Method Demonstration: Regression on a Synthetic Cohort
+
+::: {.alert .alert-warning}
+**Everything in this section uses synthetic records.** It demonstrates that the modelling code works. The wealth, education, residence and antenatal-care effects were planted from a published Nigerian analysis, and regional and year differences were calibrated to the real UDHS rates, so none of the coefficients below is an independent finding about Uganda.
+:::
+
+### Does the synthetic cohort reproduce the real rates?
+Simulated regional rates were compared with the real UDHS targets for each region and year. The largest difference was `r sprintf("%.1f", max_diff)` percentage points. In the simulated cohort, SBA rose from `r sprintf("%.1f%%", gradient$sba[1])` among the poorest quintile to `r sprintf("%.1f%%", gradient$sba[5])` among the richest, showing that the planted wealth gradient is present.
+
+```{r valid-table}
+vt <- sim %>% transmute(Region = region, Year = survey_year,
+                        `SBA real (%)` = sprintf("%.1f", sba_pct), `SBA sim (%)` = sprintf("%.1f", sba_sim),
+                        `Diff (pp)` = sgn(sba_diff),
+                        `Stunting real (%)` = sprintf("%.1f", stunted_pct), `Stunting sim (%)` = sprintf("%.1f", st_sim),
+                        `Diff (pp)  ` = sgn(st_diff),
+                        Validation = ifelse(abs(sba_diff) < 2 & abs(st_diff) < 2, "Passed", "Check"))
+kable(vt, align = "lrrrrrrrl", caption = "Real UDHS targets versus synthetic cohort")
+```
+
+### Parameter recovery
+Estimated odds ratios were compared with the planted values. `r cap(nw(n_rec))` of `r nw(n_rec_tot)` planted effects fell inside their 95% confidence intervals. This confirms that the estimation code recovers known effects when the data come from the model being fitted. It does not show that the model is correct for real data, and about one in twenty recoveries would miss by chance alone.
+
+### Model fit
+```{r fit-table}
+ft <- fit %>% transmute(Outcome = ifelse(model == "SBA", "SBA", "Stunting"),
+                        `McFadden R^2^` = sprintf("%.3f", mcfadden_r2), AUC = sprintf("%.3f", auc),
+                        Accuracy = sprintf("%.1f%%", 100 * accuracy),
+                        `Baseline accuracy` = sprintf("%.1f%%", 100 * baseline_accuracy))
+kable(ft, align = "lrrrr", caption = "Fit of the two logistic models (synthetic cohort)")
+```
+
+The SBA model separates outcomes well (AUC `r sprintf("%.2f", fit_sba$auc)`) and beats the baseline of always guessing the commoner outcome (accuracy `r sprintf("%.1f%%", 100 * fit_sba$accuracy)` against `r sprintf("%.1f%%", 100 * fit_sba$baseline_accuracy)`). The stunting model barely does: its accuracy (`r sprintf("%.1f%%", 100 * fit_st$accuracy)`) is essentially the same as the baseline (`r sprintf("%.1f%%", 100 * fit_st$baseline_accuracy)`) and its AUC is only `r sprintf("%.2f", fit_st$auc)`. This is expected in data where stunting was linked only to wealth, education and residence.
+
+### Odds ratios
+```{r or-table}
+orc <- function(tab, term) {
+  r <- or_get(tab, term)
+  if (nrow(r) == 0) return("Not included")
+  sprintf("%.2f [%.2f, %.2f]%s", r$odds_ratio, r$ci_lower, r$ci_upper,
+          ifelse(r$p_value < 0.001, ", p < 0.001", sprintf(", p = %.3f", r$p_value)))
+}
+orows <- tribble(
+  ~Predictor,                                         ~term,
+  "Urban residence vs. rural",                        "residenceUrban",
+  "Richest wealth quintile vs. poorest",              "wealth_quintileRichest",
+  "Higher education vs. none",                        "mother_educationHigher",
+  "Four or more ANC visits vs. fewer",                "anc4_visitsYes",
+  "Western Region vs. Central",                       "regionWestern",
+  "Survey year 2022 vs. 2016",                        "survey_year_f2022")
+orows <- orows %>% mutate(`SBA model: OR [95% CI]` = vapply(term, function(t) orc(or_s, t), ""),
+                          `Stunting model: OR [95% CI]` = vapply(term, function(t) orc(or_t, t), "")) %>%
+  select(-term)
+kable(orows, align = "lll", caption = "Selected odds ratios (synthetic cohort; method demonstration)")
+```
+
+The SBA model includes antenatal care, which lies partly on the pathway between wealth, education and SBA, so its wealth and education odds ratios are "holding antenatal care constant" and are smaller than total effects. The regional odds ratios (Western vs. Central) mirror the real regional rates the data were calibrated to; they restate a pattern already visible in the real data and are not a separate result.
+
+### Region by year interaction
+A likelihood-ratio test asks whether regions changed by different amounts between surveys. For SBA the interaction was significant (change in deviance = `r sprintf("%.1f", lrt_s$deviance_drop)`, df = `r lrt_s$df`, p = `r sprintf("%.4f", lrt_s$p_value)`); for stunting it was not (change in deviance = `r sprintf("%.1f", lrt_t$deviance_drop)`, df = `r lrt_t$df`, p = `r sprintf("%.3f", lrt_t$p_value)`). Because regional rates were calibrated to the real values, this reproduces the real pattern (lower-baseline regions gained more in SBA) and is not independent evidence of convergence. The real-data comparison of regional spreads is in the Regional Findings section.
+
+---
+
+## Limitations
+
+### Real-data limitations
+- **Hand-extracted tables.** Values were transcribed from published tables. They passed internal-consistency checks, but a transcription error in a single sub-region row would not be detected by those checks.
+- **Different SBA reference periods (confirmed).** UDHS 2016 Table 9.6 reports live births in the 5 years before the survey, whereas UDHS 2022 Table 9.6 reports live births in the 2 years before the survey. This explains the fall in the number of births behind the SBA rates (`r format(sum(tgt$births_n[tgt$survey_year == 2016]), big.mark = ",")` in 2016 to `r format(sum(tgt$births_n[tgt$survey_year == 2022]), big.mark = ",")` in 2022). The 2016 rate therefore averages over older births than the 2022 rate: the centres of the two windows are roughly 7.5 years apart, not 6. Because coverage was rising, the reported increase probably overstates the gain over exactly six years. It does not change the direction of the result or its statistical significance, but SBA changes should be read as differences between the two surveys' estimates. Stunting is unaffected, because it describes children alive at the survey on the same age base in both years.
+- **Design effect assumed, not measured.** The design effect of 2 is a conservative stand-in. If the true design effects are smaller, some changes labelled "significant only if design effect ignored" would in fact be robust. The UDHS sampling-error appendix could replace this assumption.
+- **Approximate sub-region matching.** Buganda (South and North Central in 2016) and Elgon (Bugisu in 2016) are matched approximately, which affects the changes reported for those two units.
+- **Derived national estimates.** National SBA and stunting in this report are derived from regional estimates weighted by share of births, and differ slightly from the published totals.
+- **Small samples.** Several sub-region samples are small (for example fewer than 200 children in some sub-regions), which limits what can be confirmed there.
+- **Two core indicators.** Maternal and child health is wider than SBA and stunting. Mortality, maternal mortality and fertility are available nationally only, so they cannot be compared across regions.
+
+### Synthetic data boundaries
+The synthetic cohort supports testing code and model specifications only. Its coefficients carry no information about the determinants of SBA or stunting in Uganda, and no programmatic or funding decision should rest on them. Investigating determinants requires access to the individual-level UDHS data under the DHS Program's terms of use, analysed with survey weights, clusters and strata (for example with the R `survey` package).
+
+### Unobserved determinants of stunting
+The synthetic stunting model has a McFadden R^2^ of `r sprintf("%.3f", fit_st$mcfadden_r2)`, so it explains very little. In real data, important determinants would include dietary diversity, water, sanitation and hygiene (WASH) conditions, micronutrient intake, infection burden, household food security, local agricultural patterns and the availability of community health and nutrition services.
+
+### Cross-sectional constraints
+The survey design limits causal interpretation. Differences between 2016 and 2022 and between areas describe associations and trends, not the effects of any intervention.

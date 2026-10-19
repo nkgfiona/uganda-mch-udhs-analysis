@@ -1,0 +1,5 @@
+indicator,value_2016,value_2022,ci_lower_2016,ci_lower_2022,ci_upper_2016,ci_upper_2022,change,verdict
+Neonatal mortality,27,22,NA,NA,NA,NA,-5,No formal test: no published standard error available
+Infant mortality,43,36,NA,NA,NA,NA,-7,No formal test: no published standard error available
+Under-5 mortality,64,52,NA,NA,NA,NA,-12,No formal test: no published standard error available
+Total fertility rate,5.8,5.2,NA,NA,NA,NA,-0.5999999999999996,No formal test: no published standard error available

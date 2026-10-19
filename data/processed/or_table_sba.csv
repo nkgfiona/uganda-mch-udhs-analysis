@@ -1,0 +1,15 @@
+"term","odds_ratio","ci_lower","ci_upper","p_value"
+"(Intercept)",0.74,0.66,0.83,0
+"regionEastern",0.35,0.32,0.4,0
+"regionNorthern",0.52,0.46,0.59,0
+"regionWestern",0.32,0.29,0.36,0
+"residenceUrban",1.77,1.56,1.99,0
+"wealth_quintilePoorer",1.5,1.36,1.65,0
+"wealth_quintileMiddle",2.36,2.11,2.65,0
+"wealth_quintileRicher",4.1,3.55,4.74,0
+"wealth_quintileRichest",6.51,5.31,7.99,0
+"mother_educationPrimary",1.54,1.4,1.7,0
+"mother_educationSecondary",2.93,2.61,3.28,0
+"mother_educationHigher",5.84,4.67,7.32,0
+"anc4_visitsYes",3.97,3.65,4.31,0
+"survey_year_f2022",3.29,2.97,3.64,0

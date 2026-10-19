@@ -1,0 +1,4 @@
+comparison,n_subregions,spearman_rho,p_value
+2016 levels: SBA vs stunting,14,-0.2571428571428571,0.3748119038799703
+2022 levels: SBA vs stunting,14,-0.0814977973568282,0.7818057339706879
+Change 2016 to 2022: SBA change vs stunting change,14,0.024175824175824177,0.9346189946036425

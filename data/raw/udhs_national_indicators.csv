@@ -1,0 +1,11 @@
+survey_year,indicator,value,unit,ci_lower,ci_upper,se_basis,note,source
+2016,Neonatal mortality,27,deaths per 1000 live births,,,none,"5-year reference period, national. No published standard error available for a formal significance test.",UDHS 2016 Table 8.1
+2016,Infant mortality,43,deaths per 1000 live births,,,none,"5-year reference period, national.",UDHS 2016 Table 8.1
+2016,Under-5 mortality,64,deaths per 1000 live births,,,none,"5-year reference period, national. Regional breakdown exists (Table 8.2) but uses a 10-year reference period and is not directly comparable to this national 5-year figure -- omitted from regional analysis for this reason.",UDHS 2016 Table 8.1
+2016,Maternal mortality ratio,336,deaths per 100000 live births,272,401,reported_CI,"7-year reference period, national only -- no regional breakdown exists in any UDHS round.",UDHS 2016 Table 15.4
+2016,Total fertility rate,5.8,births per woman,,,none,"3-year reference period, national. No published standard error extracted for a formal test.",UDHS 2016 Table 15.4
+2022,Neonatal mortality,22,deaths per 1000 live births,,,none,"5-year reference period, national.",UDHS 2022 Table 8.1
+2022,Infant mortality,36,deaths per 1000 live births,,,none,"5-year reference period, national.",UDHS 2022 Table 8.1
+2022,Under-5 mortality,52,deaths per 1000 live births,,,none,"5-year reference period, national. See 2016 note on regional non-comparability.",UDHS 2022 Table 8.1
+2022,Maternal mortality ratio,189,deaths per 100000 live births,135,242,reported_CI,"7-year reference period, national only.",UDHS 2022 Table 16.4
+2022,Total fertility rate,5.2,births per woman,,,none,"3-year reference period, national.",UDHS 2022 Table 16.4

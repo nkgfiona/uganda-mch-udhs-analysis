@@ -1,0 +1,21 @@
+unit,survey_year,indicator,value,n,n_basis
+Central,2016,Skilled birth attendance,82.2,4106,births N
+Central,2016,Stunting (under 5),26.2,1285,children N (reported)
+Eastern,2016,Skilled birth attendance,69.9,4298,births N
+Eastern,2016,Stunting (under 5),25.5,1474,children N (reported)
+Northern,2016,Skilled birth attendance,75.3,3039,births N
+Northern,2016,Stunting (under 5),29.9,1026,children N (reported)
+Western,2016,Skilled birth attendance,69.3,3830,births N
+Western,2016,Stunting (under 5),34.5,1332,children N (reported)
+Central,2022,Skilled birth attendance,92.4,1616,births N
+Central,2022,Stunting (under 5),20.8,955,children N (reported)
+Eastern,2022,Skilled birth attendance,85.6,1551,births N
+Eastern,2022,Stunting (under 5),20.5,1601,children N (reported)
+Northern,2022,Skilled birth attendance,87.5,1208,births N
+Northern,2022,Stunting (under 5),25.1,1246,children N (reported)
+Western,2022,Skilled birth attendance,87.7,1352,births N
+Western,2022,Stunting (under 5),31,1212,children N (reported)
+National,2016,Skilled birth attendance,74.13036,15273,births N
+National,2016,Stunting (under 5),28.82096,5117,children N (reported)
+National,2022,Skilled birth attendance,88.41548,5727,births N
+National,2022,Stunting (under 5),24.03385,5014,children N (reported)

@@ -1,0 +1,3 @@
+"model","n","mcfadden_r2","auc","accuracy","baseline_accuracy"
+"SBA",21000,0.286,0.852,0.821,0.779
+"Stunting",21000,0.071,0.682,0.723,0.72

@@ -1,0 +1,2 @@
+indicator,value_2016,value_2022,ci_lower_2016,ci_lower_2022,ci_upper_2016,ci_upper_2022,change,se_2016,se_2022,se_diff,z,p_value,verdict
+Maternal mortality ratio,336,189,272,135,401,242,-147,32.90816326530612,27.29591836734694,42.75528469105207,-3.438171469614013,5.856567166457274e-4,Significant (based on published CIs)

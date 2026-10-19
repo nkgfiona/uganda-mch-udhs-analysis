@@ -1,0 +1,57 @@
+unit,broad_region,crosswalk,survey_year,indicator,value,n,n_basis
+Acholi,Northern,same name both years,2016,Skilled birth attendance,80.8,741,births N
+Acholi,Northern,same name both years,2016,Stunting (under 5),30.6,270,children N (reported)
+Ankole,Western,same name both years,2016,Skilled birth attendance,70.8,1209,births N
+Ankole,Western,same name both years,2016,Stunting (under 5),29.3,399,children N (reported)
+Buganda,Central,approximate (merged/renamed),2016,Skilled birth attendance,80.02067498581964,3526,births N
+Buganda,Central,approximate (merged/renamed),2016,Stunting (under 5),27.184811237928006,1139,children N (reported)
+Bukedi,Eastern,same name both years,2016,Skilled birth attendance,67.2,1060,births N
+Bukedi,Eastern,same name both years,2016,Stunting (under 5),22.8,363,children N (reported)
+Bunyoro,Western,same name both years,2016,Skilled birth attendance,57.7,905,births N
+Bunyoro,Western,same name both years,2016,Stunting (under 5),34.5,311,children N (reported)
+Busoga,Eastern,same name both years,2016,Skilled birth attendance,74.7,1527,births N
+Busoga,Eastern,same name both years,2016,Stunting (under 5),29,538,children N (reported)
+Elgon,Eastern,approximate (merged/renamed),2016,Skilled birth attendance,57.6,763,births N
+Elgon,Eastern,approximate (merged/renamed),2016,Stunting (under 5),36,251,children N (reported)
+Kampala,Central,same name both years,2016,Skilled birth attendance,95.5,580,births N
+Kampala,Central,same name both years,2016,Stunting (under 5),18.1,146,children N (reported)
+Karamoja,Northern,same name both years,2016,Skilled birth attendance,72.5,432,births N
+Karamoja,Northern,same name both years,2016,Stunting (under 5),35.2,120,children N (reported)
+Kigezi,Western,same name both years,2016,Skilled birth attendance,70.7,506,births N
+Kigezi,Western,same name both years,2016,Stunting (under 5),30.699999999999996,168,children N (reported)
+Lango,Northern,same name both years,2016,Skilled birth attendance,68.3,799,births N
+Lango,Northern,same name both years,2016,Stunting (under 5),22.3,288,children N (reported)
+Teso,Eastern,same name both years,2016,Skilled birth attendance,75.3,948,births N
+Teso,Eastern,same name both years,2016,Stunting (under 5),14.3,322,children N (reported)
+Tooro,Western,same name both years,2016,Skilled birth attendance,75.9,1210,births N
+Tooro,Western,same name both years,2016,Stunting (under 5),40.6,454,children N (reported)
+West Nile,Northern,same name both years,2016,Skilled birth attendance,77.9,1067,births N
+West Nile,Northern,same name both years,2016,Stunting (under 5),33.9,348,children N (reported)
+Acholi,Northern,same name both years,2022,Skilled birth attendance,88.9,221,births N
+Acholi,Northern,same name both years,2022,Stunting (under 5),16.7,265,children N (reported)
+Ankole,Western,same name both years,2022,Skilled birth attendance,89.6,376,births N
+Ankole,Western,same name both years,2022,Stunting (under 5),28.600000000000005,313,children N (reported)
+Buganda,Central,approximate (merged/renamed),2022,Skilled birth attendance,91.6,1368,births N
+Buganda,Central,approximate (merged/renamed),2022,Stunting (under 5),22.4,735,children N (reported)
+Bukedi,Eastern,same name both years,2022,Skilled birth attendance,83.4,352,births N
+Bukedi,Eastern,same name both years,2022,Stunting (under 5),27.2,374,children N (reported)
+Bunyoro,Western,same name both years,2022,Skilled birth attendance,84.7,395,births N
+Bunyoro,Western,same name both years,2022,Stunting (under 5),24.199999999999996,366,children N (reported)
+Busoga,Eastern,same name both years,2022,Skilled birth attendance,87.4,553,births N
+Busoga,Eastern,same name both years,2022,Stunting (under 5),21.2,480,children N (reported)
+Elgon,Eastern,approximate (merged/renamed),2022,Skilled birth attendance,85.6,232,births N
+Elgon,Eastern,approximate (merged/renamed),2022,Stunting (under 5),22.4,306,children N (reported)
+Kampala,Central,same name both years,2022,Skilled birth attendance,96.9,248,births N
+Kampala,Central,same name both years,2022,Stunting (under 5),15.5,220,children N (reported)
+Karamoja,Northern,same name both years,2022,Skilled birth attendance,86.7,399,births N
+Karamoja,Northern,same name both years,2022,Stunting (under 5),41.1,311,children N (reported)
+Kigezi,Western,same name both years,2022,Skilled birth attendance,88.9,194,births N
+Kigezi,Western,same name both years,2022,Stunting (under 5),37.4,189,children N (reported)
+Lango,Northern,same name both years,2022,Skilled birth attendance,87.6,368,births N
+Lango,Northern,same name both years,2022,Stunting (under 5),16.6,298,children N (reported)
+Teso,Eastern,same name both years,2022,Skilled birth attendance,84.90000000000002,414,births N
+Teso,Eastern,same name both years,2022,Stunting (under 5),12.9,441,children N (reported)
+Tooro,Western,same name both years,2022,Skilled birth attendance,88.3,387,births N
+Tooro,Western,same name both years,2022,Stunting (under 5),37,344,children N (reported)
+West Nile,Northern,same name both years,2022,Skilled birth attendance,87.3,220,births N
+West Nile,Northern,same name both years,2022,Stunting (under 5),24.6,372,children N (reported)
